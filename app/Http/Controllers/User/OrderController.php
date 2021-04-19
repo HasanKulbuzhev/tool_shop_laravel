@@ -5,6 +5,7 @@ namespace App\Http\Controllers\User;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class OrderController extends Controller
 {
@@ -45,9 +46,12 @@ class OrderController extends Controller
      * @param  \App\Models\Order  $order
      * @return \Illuminate\Http\Response
      */
-    public function show(Order $order)
+    public function show(Order $cart)
     {
         //
+        $user = Auth::user();
+        $products_to_cart = $cart->products()->get();
+        return view('auth.checkout',compact('products_to_cart','user'));
     }
 
     /**
@@ -71,6 +75,11 @@ class OrderController extends Controller
     public function update(Request $request, Order $order)
     {
         //
+        //$order->status = 'Processing';
+        //
+
+        //$order->update($request->all());
+        dd($request->all());
     }
 
     /**

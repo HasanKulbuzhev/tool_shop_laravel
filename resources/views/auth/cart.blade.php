@@ -35,7 +35,7 @@
                             </tr>
                             </thead>
                             <tbody>
-                            @foreach($products_to_carts as $product)
+                            @foreach($cart->products()->get() as $product)
                             <tr>
                                 <td class="product-thumbnail">
                                     <a href="#"><img src="img/products/1.jpg" alt="cart-image" /></a>
@@ -46,7 +46,6 @@
                                 <td class="product-subtotal">£{{ $product->get_total_price() }}</td>
                                 <td class="product-remove"> <a href="{{ route('remove-from-cart',$product->id) }}"><i class="fa fa-times" aria-hidden="true"></i></a></td>
                             </tr>
-                                {{ $cart_total_price += $product->get_total_price() }}
                             @endforeach
                             <tr>
                                 <td class="product-thumbnail">
@@ -90,13 +89,13 @@
                                     <tr class="order-total">
                                         <th>Total</th>
                                         <td>
-                                            <strong><span class="amount">${{ $cart_total_price }}</span></strong>
+                                            <strong><span class="amount">${{ $cart->price }}</span></strong>
                                         </td>
                                     </tr>
                                     </tbody>
                                 </table>
                                 <div class="wc-proceed-to-checkout">
-                                    <a href="#">Proceed to Checkout</a>
+                                    <a href="{{ route('orders.show',$cart) }}">Proceed to Checkout</a>
                                 </div>
                             </div>
                         </div>

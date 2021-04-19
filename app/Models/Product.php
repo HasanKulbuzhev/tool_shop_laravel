@@ -22,7 +22,7 @@ class Product extends Model
     {
         if ($this->pivot->count > 1){
             return $this->pivot->count * $this->price;
-        }
+        }else
         return $this->price;
     }
 //

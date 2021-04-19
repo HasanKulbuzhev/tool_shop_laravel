@@ -28,7 +28,11 @@ Route::group([
     Route::get('/add-to-cart/{product_id}','App\Http\Controllers\HomeController@add_to_cart')->name('add-to-cart');
     Route::get('/remove-from-cart/{product_id}','App\Http\Controllers\HomeController@remove_from_cart')->name('remove-from-cart');
     Route::get('/cart-update/','App\Http\Controllers\HomeController@cart_update')->name('cart-update');
-    Route::get('/account', 'App\Http\Controllers\HomeController@account')->name('account')->middleware('auth');
+    Route::get('/account', 'App\Http\Controllers\HomeController@account')->name('account');
+    //Заказ товара
+    Route::resource('orders','App\Http\Controllers\User\OrderController');
+    Route::get('/checkout/{cart}', 'App\Http\Controllers\User\OrderController@index')->name('checkout');
+    Route::post('/order_create/{order}', 'App\Http\Controllers\User\OrderController@create')->name('order-create');
 });
 
 

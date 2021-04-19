@@ -54,6 +54,7 @@ class User extends Authenticatable
 
     public function cart()
     {
+
         return $this->orders()->where('status', 'cart')->first();
     }
 }

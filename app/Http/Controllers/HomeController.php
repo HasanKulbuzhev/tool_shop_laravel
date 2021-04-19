@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\ProductRequest;
 use App\Models\Order;
+use App\Models\Product;
 use http\Client\Curl\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -32,14 +34,20 @@ class HomeController extends Controller
     public function account()
     {
         $user = Auth::user();
-        return view('auth.account',compact('user'));
+        return view('auth.users.account',compact('user'));
+    }
+
+    public function checkout()
+    {
+        $user = Auth::user();
+        $products_to_cart = $user->cart()->products()->get();
+        return view('auth.checkout',compact('products_to_cart','user'));
     }
 
     public function cart()
     {
-        $products_to_carts = Auth::user()->cart()->products()->get();
-        $cart_total_price = 0;
-        return view('auth.cart',compact('products_to_carts','cart_total_price'));
+        $cart = Auth::user()->cart();
+        return view('auth.cart',compact('cart'));
     }
 
     public function create_cart()
@@ -49,15 +57,22 @@ class HomeController extends Controller
 
     public function add_to_cart($product_id)
     {
-        $products_in_cart = Auth::user()->cart()->products();
+        $cart = Auth::user()->cart();//понадобится для добавления общей цены
+        $products_in_cart = $cart->products();//понадобится для проверки
+        $added_product = $products_in_cart->get()->where('id',$product_id)->first();//понадобится для добавления продукта в корзину
+
         //проверка,  если продукт есть в корзине ,он лишь добавляет count
         if($products_in_cart->get()->contains($product_id)){
-            $updated_product = $products_in_cart->get()->where('id',$product_id)->first()->pivot;
-            $updated_product->count++;
-            $updated_product->update();
+            $added_product->pivot->count++;
+            $added_product->pivot->update();
+            $cart->price += $added_product->price;
         }else{
             $products_in_cart->attach($product_id);
+            $cart->price += $products_in_cart->get()->where('id',$product_id)->first()->price;//если товара нету в корзине,то он его не найдёт
+            //поэтому я не использовал тут added_products,т.к. в нём будет значение только если в корзине уже есть этот товар
         }
+
+        $cart->update();
         return redirect()->back();
     }
 
@@ -68,10 +83,12 @@ class HomeController extends Controller
 
     public function remove_from_cart($product_id)
     {
-        $products_in_cart = Auth::user()->cart()->products();
-        //проверка, если продукт есть в корзине ,он лишь добавляет count
-            $products_in_cart->detach($product_id);
-            return redirect()->back();
+        $cart = Auth::user()->cart();
+        $products_in_cart = $cart->products();
+        $cart->price -= $products_in_cart->get()->where('id',$product_id)->first()->price;
+        $cart->update();
+        $products_in_cart->detach($product_id);
+        return redirect()->route('cart');
 
     }
 
