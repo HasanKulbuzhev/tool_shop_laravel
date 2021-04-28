@@ -75,6 +75,7 @@ class OrderController extends Controller
     public function update(Request $request, Order $order)
     {
         //
+        $request->request->add(['status' => 'Processing']);
         //$order->status = 'Processing';
         //
 
